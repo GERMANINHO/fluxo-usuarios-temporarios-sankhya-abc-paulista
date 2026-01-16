@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fluxo — Solicitação de Liberação Temporária de Usuários Adicionais</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@300;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f5f3e7;
+      --text:#443c3d;
+
+      --modal-bg:#ffffff;
+      --overlay:rgba(0,0,0,.45);
+
+      --btn-bg:#0f172a0f;
+      --btn-border:#cbd5e1;
+      --btn-hover:#0f172a14;
+      --btn-text:#0f172a;
+    }
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:"Open Sans Condensed",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    }
+
+    .wrapper{ padding:42px 90px; }
+    .title{
+      margin:0 0 14px;
+      font-size:24px;
+      text-transform:uppercase;
+      letter-spacing:.8px;
+      font-weight:700;
+    }
+    .subtitle{
+      margin:0 0 22px;
+      font-size:14px;
+      opacity:.85;
+      letter-spacing:.3px;
+    }
+
+    .svg-container{ position:relative; width:100%; padding-bottom:56%; overflow:hidden; background:var(--bg); }
+    .svg-content{ position:absolute; inset:0; }
+
+    .node{ cursor:pointer; outline:none; }
+    .node-label{
+      font-weight:900;
+      fill:#f5f3e7;
+      text-transform:uppercase;
+      letter-spacing:.45px;
+      font-size:10px;
+      pointer-events:none;
+    }
+    .node-label.xs{ font-size:8px; }
+    .node-label.xxs{ font-size:7px; }
+
+    .edge--dotted{
+      stroke:#333;
+      stroke-width:2;
+      stroke-dasharray:2 1;
+      fill:none;
+      stroke-linecap:round;
+    }
+
+    /* Modal */
+    .modal{
+      position:fixed; inset:0;
+      display:none; align-items:center; justify-content:center;
+      background:var(--overlay);
+      z-index:999;
+      padding:18px;
+    }
+    .modal.open{ display:flex; }
+    .modal__panel{
+      background:var(--modal-bg);
+      color:var(--text);
+      width:min(92vw,860px);
+      border-radius:16px;
+      box-shadow:0 10px 40px rgba(0,0,0,.25);
+      padding:20px 20px 16px;
+      border:1px solid #e2e8f0;
+      max-height:86vh;
+      overflow:auto;
+    }
+    .modal__header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      margin-bottom:8px;
+    }
+    .modal__title{
+      margin:0;
+      font-size:20px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      font-weight:700;
+    }
+    .modal__close{
+      appearance:none;
+      border:0;
+      background:transparent;
+      font-size:20px;
+      line-height:1;
+      padding:6px 10px;
+      border-radius:8px;
+      cursor:pointer;
+      color:var(--btn-text);
+    }
+    .modal__close:hover{ background:#0001; }
+
+    .modal__body{ padding:8px 2px 0; }
+    .modal__body h3{ margin:12px 0 6px; font-size:16px; }
+    .modal__body ul, .modal__body ol{ margin:8px 0 8px 18px; }
+    .modal__body p{ margin:6px 0; font-size:14px; line-height:1.4; }
+
+    .modal__actions{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    .btn{
+      display:inline-block;
+      text-decoration:none;
+      text-align:center;
+      padding:12px 16px;
+      border-radius:12px;
+      border:1px solid var(--btn-border);
+      background:var(--btn-bg);
+      color:var(--btn-text);
+      font-weight:700;
+      letter-spacing:.6px;
+      text-transform:uppercase;
+      transition: background .2s, box-shadow .2s, transform .06s;
+      cursor:pointer;
+    }
+    .btn:hover,.btn:focus{ background:var(--btn-hover); box-shadow:0 0 0 2px #00000010 inset; }
+    .btn:active{ transform:translateY(1px); }
+
+    .callout{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:#0f172a0a;
+      border:1px dashed #94a3b8;
+      font-size:14px;
+    }
+
+    textarea{
+      width:100%;
+      min-height:240px;
+      resize:vertical;
+      border-radius:12px;
+      border:1px solid #cbd5e1;
+      padding:10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px;
+      background:#fff;
+      color:#111827;
+      box-sizing:border-box;
+    }
+
+    code{ background:#00000010; padding:2px 6px; border-radius:8px; }
+
+    @media (max-width:900px){
+      .wrapper{ padding:18px; }
+      .svg-container{ padding-bottom:88%; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <h1 class="title">Fluxo — Liberação Temporária de Usuários Adicionais</h1>
+    <p class="subtitle">Solicitação por e-mail à Central de Projetos Sankhya (modelo padronizado + evidências).</p>
+
+    <div class="svg-container">
+      <svg viewBox="0 0 1000 520" class="svg-content" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- INÍCIO -->
+        <g transform="translate(40,60)">
+          <circle cx="55" cy="55" r="48" fill="#000"/>
+          <text x="55" y="55" fill="#fff" font-size="22"
+                text-anchor="middle" dominant-baseline="middle">INÍCIO</text>
+        </g>
+
+        <!-- INÍCIO -> PASSO 1 -->
+        <line x1="143" y1="115" x2="210" y2="115" class="edge--dotted"/>
+
+        <!-- PASSO 1 -->
+        <g class="node" id="node-1" tabindex="0" role="button" aria-label="Abrir Passo 1"
+           transform="translate(210,80)">
+          <rect width="210" height="70" rx="8" fill="#66cc00"/>
+          <text class="node-label xxs" x="105" y="26" text-anchor="middle">
+            <tspan x="105">PASSO 1</tspan>
+            <tspan x="105" dy="14">ENDEREÇAR</tspan>
+            <tspan x="105" dy="14">E-MAIL À CENTRAL</tspan>
+          </text>
+        </g>
+
+        <!-- PASSO 1 -> PASSO 2 -->
+        <line x1="420" y1="115" x2="490" y2="115" class="edge--dotted"/>
+
+        <!-- PASSO 2 -->
+        <g class="node" id="node-2" tabindex="0" role="button" aria-label="Abrir Passo 2"
+           transform="translate(490,80)">
+          <rect width="220" height="70" rx="8" fill="#66cc00"/>
+          <text class="node-label xxs" x="110" y="26" text-anchor="middle">
+            <tspan x="110">PASSO 2</tspan>
+            <tspan x="110" dy="14">PREENCHER</tspan>
+            <tspan x="110" dy="14">MODELO DO E-MAIL</tspan>
+          </text>
+        </g>
+
+        <!-- PASSO 2 -> PASSO 3 -->
+        <line x1="710" y1="115" x2="780" y2="115" class="edge--dotted"/>
+
+        <!-- PASSO 3 -->
+        <g class="node" id="node-3" tabindex="0" role="button" aria-label="Abrir Passo 3"
+           transform="translate(780,80)">
+          <rect width="200" height="70" rx="8" fill="#66cc00"/>
+          <text class="node-label xxs" x="100" y="26" text-anchor="middle">
+            <tspan x="100">PASSO 3</tspan>
+            <tspan x="100" dy="14">REVISAR</tspan>
+            <tspan x="100" dy="14">E ENVIAR</tspan>
+          </text>
+        </g>
+
+        <!-- PASSO 3 -> PASSO 4 (U) -->
+        <line x1="880" y1="150" x2="880" y2="260" class="edge--dotted"/>
+        <line x1="880" y1="260" x2="360" y2="260" class="edge--dotted"/>
+        <line x1="360" y1="260" x2="360" y2="290" class="edge--dotted"/>
+
+        <!-- PASSO 4 -->
+        <g class="node" id="node-4" tabindex="0" role="button" aria-label="Abrir Passo 4"
+           transform="translate(210,290)">
+          <rect width="300" height="70" rx="8" fill="#66cc00"/>
+          <text class="node-label xxs" x="150" y="26" text-anchor="middle">
+            <tspan x="150">PASSO 4</tspan>
+            <tspan x="150" dy="14">REGISTRAR</tspan>
+            <tspan x="150" dy="14">EVIDÊNCIAS</tspan>
+          </text>
+        </g>
+
+        <!-- PASSO 4 -> PASSO 5 -->
+        <line x1="510" y1="325" x2="580" y2="325" class="edge--dotted"/>
+
+        <!-- PASSO 5 -->
+        <g class="node" id="node-5" tabindex="0" role="button" aria-label="Abrir Passo 5"
+           transform="translate(580,290)">
+          <rect width="280" height="70" rx="8" fill="#66cc00"/>
+          <text class="node-label xxs" x="140" y="26" text-anchor="middle">
+            <tspan x="140">PASSO 5</tspan>
+            <tspan x="140" dy="14">ACOMPANHAR</tspan>
+            <tspan x="140" dy="14">E ENCERRAR</tspan>
+          </text>
+        </g>
+
+        <!-- PASSO 5 -> FIM -->
+        <line x1="860" y1="325" x2="920" y2="325" class="edge--dotted"/>
+
+        <!-- FIM -->
+        <g transform="translate(915,270)">
+          <circle cx="55" cy="55" r="48" fill="#000"/>
+          <text x="55" y="55" fill="#fff" font-size="22"
+                text-anchor="middle" dominant-baseline="middle">FIM</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal__panel" role="document">
+      <div class="modal__header">
+        <h2 class="modal__title" id="modal-title">Etapa</h2>
+        <button class="modal__close" type="button" id="modal-close" aria-label="Fechar">✕</button>
+      </div>
+      <div class="modal__body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Templates -->
+  <template id="tpl-1">
+    <p><strong>Objetivo:</strong> encaminhar a solicitação para o canal correto.</p>
+
+    <h3>1.1 — Destinatário</h3>
+    <p>Enviar para: <strong>Central de Projetos Sankhya</strong> — <code>centraldeprojetos@sankhya.com.br</code></p>
+
+    <h3>1.2 — Assunto padrão</h3>
+    <p><code>LIBERAÇÃO DE USUÁRIOS: Apoio a Consultor</code></p>
+
+    <div class="callout">
+      <strong>Dica:</strong> se você usar mais de uma conta no Gmail, ajuste o índice do usuário no código (Passo 2) para abrir a conta certa.
+    </div>
+  </template>
+
+  <template id="tpl-2">
+    <p><strong>Objetivo:</strong> preencher o modelo completo (sem faltar campos).</p>
+
+    <h3>2.1 — Modelo do e-mail (copie e preencha)</h3>
+    <textarea id="email-template" readonly></textarea>
+
+    <div class="modal__actions">
+      <button class="btn" type="button" id="btn-copy-template">Copiar modelo</button>
+      <button class="btn" type="button" id="btn-open-gmail">Abrir Gmail com o modelo</button>
+    </div>
+
+    <div class="callout">
+      <strong>Observação:</strong> se o pedido for <em>Projeto inicial</em> ou <em>Segunda fase</em>, não esqueça de preencher o bloco de projeto (etapa, GP, produção, go-live e conclusão).
+    </div>
+  </template>
+
+  <template id="tpl-3">
+    <p><strong>Objetivo:</strong> reduzir retrabalho e acelerar a aprovação.</p>
+
+    <h3>3.1 — Checklist de revisão antes de enviar</h3>
+    <ol>
+      <li><strong>Modalidade do contrato</strong> preenchida (Evo / Evo por usuário / Padrão).</li>
+      <li><strong>Quantos usuários em contrato</strong> + <strong>quantos liberar</strong> (números claros).</li>
+      <li><strong>Nomes dos usuários Sankhya</strong> exatamente como aparecem no sistema.</li>
+      <li><strong>Prazo desejado</strong> (com data final explícita).</li>
+      <li><strong>Justificativa</strong> objetiva.</li>
+      <li><strong>Número FAP</strong> preenchido.</li>
+      <li>Se for projeto (inicial/2ª fase): <strong>etapa</strong>, <strong>GP</strong>, <strong>produção</strong>, <strong>go-live</strong> e <strong>conclusão</strong>.</li>
+    </ol>
+
+    <div class="callout">
+      <strong>Importante:</strong> esta página não envia e-mail automaticamente — ela apenas prepara o texto e abre o Gmail para você revisar e enviar.
+    </div>
+  </template>
+
+  <template id="tpl-4">
+    <p><strong>Objetivo:</strong> garantir rastreabilidade (o pedido não pode “ficar solto”).</p>
+
+    <h3>4.1 — O que registrar no ticket/atendimento</h3>
+    <ul>
+      <li>Data/hora do envio do e-mail</li>
+      <li>Prazo solicitado (data final)</li>
+      <li>Quantos usuários extras e quais nomes</li>
+      <li>Número FAP</li>
+    </ul>
+
+    <h3>4.2 — Evidências</h3>
+    <ul>
+      <li>Print/PDF do e-mail enviado (ou encaminhar o e-mail para manter histórico)</li>
+      <li>Resposta/OK da Central (na mesma thread)</li>
+    </ul>
+  </template>
+
+  <template id="tpl-5">
+    <p><strong>Objetivo:</strong> acompanhar o retorno e encerrar o ciclo corretamente.</p>
+
+    <h3>5.1 — Acompanhar retorno da Central</h3>
+    <ul>
+      <li>Se pedirem complementos: responda na mesma thread e atualize o ticket.</li>
+      <li>Se aprovado/liberado: registre o “OK” e a data final acordada.</li>
+    </ul>
+
+    <h3>5.2 — Encerramento</h3>
+    <ol>
+      <li>Confirmar com o cliente que a liberação foi aplicada e está funcional.</li>
+      <li>Garantir que existe uma <strong>data final</strong> registrada.</li>
+      <li>Agendar internamente o lembrete de <strong>retirada/desativação</strong> ao final do prazo.</li>
+    </ol>
+
+    <div class="callout">
+      <strong>Boa prática:</strong> se o cliente precisar manter usuários adicionais, tratar como regularização (aquisição formal / alteração contratual).
+    </div>
+  </template>
+
+  <script>
+    (function(){
+      // ===== AJUSTE OPCIONAL (GMAIL) =====
+      // Se o seu Gmail corporativo abre em uma URL do tipo:
+      //   https://mail.google.com/mail/u/2/#inbox
+      // então coloque "2" abaixo. Se deixar vazio, abre a conta padrão do navegador.
+      const GMAIL_USER_INDEX = "";
+
+      const EMAIL_TO = "centraldeprojetos@sankhya.com.br";
+      const EMAIL_SUBJECT = "LIBERAÇÃO DE USUÁRIOS: Apoio a Consultor";
+
+      const EMAIL_BODY = [
+        "LIBERAÇÃO DE USUÁRIOS: Apoio a Consultor",
+        "➡️Data da Solicitação:",
+        "➡️  Parceiro:",
+        "➡️  Nr.Contato:",
+        "➡️  Modalidade do Contrato [Evo, Evo por usuário, Padrão....?]",
+        "➡️  Quantos usuários foram adquiridos em contrato?",
+        "➡️  Quantos usuários precisa liberar?",
+        "➡️  O cliente já foi bonificado com usuários para apoio consultor anteriormente?",
+        "➡️  Qual o nome dos usuários Sankhya que vão utilizar essas licenças?",
+        "➡️  Prazo desejado da liberação temporária?",
+        "➡️  Justificativa:",
+        "",
+        "➡️  Número FAP:",
+        "➡️  Projeto inicial, segunda fase ou demanda avulsa?",
+        "➡️➡️➡️  Se projeto inicial ou segunda fase, preencher abaixo:",
+        "➡️➡️➡️➡️  Etapa atual do projeto:",
+        "➡️➡️➡️➡️  Nome do GP:",
+        "➡️➡️➡️➡️  Já entrou em produção, exceto demanda avulsa:",
+        "➡️➡️➡️➡️  Se não entrou em produção, qual a data prevista para Go-live?",
+        "➡️➡️➡️➡️  Data prevista para conclusão do projeto?"
+      ].join("\n");
+
+      const modal = document.getElementById('modal');
+      const modalTitle = document.getElementById('modal-title');
+      const modalBody = document.getElementById('modal-body');
+      const btnClose = document.getElementById('modal-close');
+
+      const nodes = [
+        { id:'node-1', title:'Passo 1 — Endereçar e-mail à Central', tpl:'tpl-1' },
+        { id:'node-2', title:'Passo 2 — Preencher modelo do e-mail', tpl:'tpl-2' },
+        { id:'node-3', title:'Passo 3 — Revisar e enviar', tpl:'tpl-3' },
+        { id:'node-4', title:'Passo 4 — Registrar evidências', tpl:'tpl-4' },
+        { id:'node-5', title:'Passo 5 — Acompanhar e encerrar', tpl:'tpl-5' },
+      ];
+
+      let lastTrigger = null;
+
+      function copyText(text){
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          return navigator.clipboard.writeText(text);
+        }
+        return new Promise((resolve)=>{
+          const temp = document.createElement('textarea');
+          temp.value = text;
+          document.body.appendChild(temp);
+          temp.select();
+          try{ document.execCommand('copy'); }catch(e){}
+          document.body.removeChild(temp);
+          resolve();
+        });
+      }
+
+      function gmailComposeUrl(){
+        const base = GMAIL_USER_INDEX
+          ? `https://mail.google.com/mail/u/${GMAIL_USER_INDEX}/?view=cm&fs=1`
+          : `https://mail.google.com/mail/?view=cm&fs=1`;
+
+        return base
+          + `&to=${encodeURIComponent(EMAIL_TO)}`
+          + `&su=${encodeURIComponent(EMAIL_SUBJECT)}`
+          + `&body=${encodeURIComponent(EMAIL_BODY)}`;
+      }
+
+      function initStep2(){
+        const box = document.getElementById('email-template');
+        if (box) box.value = EMAIL_BODY;
+
+        const btnCopy = document.getElementById('btn-copy-template');
+        const btnGmail = document.getElementById('btn-open-gmail');
+
+        btnCopy && btnCopy.addEventListener('click', ()=>{
+          copyText(EMAIL_BODY).then(()=> alert('Modelo copiado para a área de transferência.'));
+        });
+
+        btnGmail && btnGmail.addEventListener('click', ()=>{
+          window.open(gmailComposeUrl(), '_blank', 'noopener');
+        });
+      }
+
+      function openModal(title, templateId, triggerEl){
+        const tpl = document.getElementById(templateId);
+        if (!tpl) return;
+
+        lastTrigger = triggerEl || null;
+        modalTitle.textContent = title;
+        modalBody.innerHTML = tpl.innerHTML;
+
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden','false');
+
+        document.documentElement.style.overflow='hidden';
+        document.body.style.overflow='hidden';
+
+        if (templateId === 'tpl-2'){
+          setTimeout(initStep2, 0);
+        }
+      }
+
+      function closeModal(){
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden','true');
+        modalBody.innerHTML = '';
+
+        document.documentElement.style.overflow='';
+        document.body.style.overflow='';
+
+        if (lastTrigger && lastTrigger.focus) lastTrigger.focus();
+      }
+
+      nodes.forEach(n=>{
+        const el = document.getElementById(n.id);
+        if (!el) return;
+
+        el.addEventListener('click', ()=>openModal(n.title, n.tpl, el));
+        el.addEventListener('keydown', (e)=>{
+          if (e.key==='Enter' || e.key===' '){
+            e.preventDefault();
+            openModal(n.title, n.tpl, el);
+          }
+        });
+      });
+
+      btnClose.addEventListener('click', closeModal);
+      modal.addEventListener('click', (e)=>{ if (e.target === modal) closeModal(); });
+
+      document.addEventListener('keydown', (e)=>{
+        if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+      });
+    })();
+  </script>
+</body>
+</html>
