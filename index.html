@@ -28,20 +28,8 @@
       font-family:"Open Sans Condensed",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
     }
 
+    /* Mantive o padding do wrapper, mas removi título/subtítulo do HTML */
     .wrapper{ padding:42px 90px; }
-    .title{
-      margin:0 0 14px;
-      font-size:24px;
-      text-transform:uppercase;
-      letter-spacing:.8px;
-      font-weight:700;
-    }
-    .subtitle{
-      margin:0 0 22px;
-      font-size:14px;
-      opacity:.85;
-      letter-spacing:.3px;
-    }
 
     .svg-container{ position:relative; width:100%; padding-bottom:56%; overflow:hidden; background:var(--bg); }
     .svg-content{ position:absolute; inset:0; }
@@ -173,9 +161,6 @@
 
 <body>
   <div class="wrapper">
-    <h1 class="title">Fluxo — Liberação Temporária de Usuários Adicionais</h1>
-    <p class="subtitle">Solicitação por e-mail à Central de Projetos Sankhya (modelo padronizado + evidências).</p>
-
     <div class="svg-container">
       <svg viewBox="0 0 1000 520" class="svg-content" xmlns="http://www.w3.org/2000/svg">
 
@@ -258,11 +243,11 @@
           </text>
         </g>
 
-        <!-- PASSO 5 -> FIM -->
-        <line x1="860" y1="325" x2="920" y2="325" class="edge--dotted"/>
+        <!-- PASSO 5 -> FIM (ajustado para não cortar o círculo) -->
+        <line x1="860" y1="325" x2="890" y2="325" class="edge--dotted"/>
 
-        <!-- FIM -->
-        <g transform="translate(915,270)">
+        <!-- FIM (reposicionado para dentro do viewBox) -->
+        <g transform="translate(885,270)">
           <circle cx="55" cy="55" r="48" fill="#000"/>
           <text x="55" y="55" fill="#fff" font-size="22"
                 text-anchor="middle" dominant-baseline="middle">FIM</text>
